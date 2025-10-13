@@ -268,14 +268,9 @@ int main(int argc, char **argv) {
 	// This function initialises the attached controllers
 	WPAD_Init();
 
-	bool ahbprot = true;
+	bool ahbprot = disable_ahbprot();
 
-	if (AHBPROT_DISABLED) {
-		ahbprot = false;
-	} else {
-		disable_ahbprot();
-		//if (!AHBPROT_DISABLED) exit(0);
-	}
+	if (!AHBPROT_DISABLED) exit(0);
 
 	CONF_Init();
 
@@ -288,7 +283,7 @@ int main(int argc, char **argv) {
 	char model[14];
 	u32 boot2ver = 0;
 	u32 numoftitles = 0;
-	if (!ahbprot) { // A wise man once told me that AHBPROT should be absent for homebrew to prosper
+	if (ahbprot) { // A wise man once told me that AHBPROT should be absent for homebrew to prosper
 		DI_Init();
 		if(!DI_Identify(&DI_id)) {
 			sprintf(drivedate, "%8X", DI_id.rel_date); // Prints it as "YYYYMMDD"
@@ -343,7 +338,7 @@ int main(int argc, char **argv) {
 	VIDEO_WaitVSync();
 	if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	printf("\x1b[3;%dH",33);
+	printf("\x1b[3;%dH",31);
 
 	printf("NiioFetch %s", VER);
 
