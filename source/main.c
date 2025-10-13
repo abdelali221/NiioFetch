@@ -5,6 +5,7 @@
 #include <wiiuse/wpad.h>
 #include <string.h>
 #include <di/di.h>
+#include "ios.h"
 
 #define AHBPROT_DISABLED (*(vu32*)0xcd800064 == 0xFFFFFFFF)
 
@@ -15,7 +16,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "0.1"
+#define VER "1.0"
 
 const char *languages[] = {
 	"Japanese",
@@ -269,7 +270,12 @@ int main(int argc, char **argv) {
 
 	bool ahbprot = true;
 
-	if (AHBPROT_DISABLED) ahbprot = false; // We'll see later if I'll do a /dev/sha exploit...
+	if (AHBPROT_DISABLED) {
+		ahbprot = false;
+	} else {
+		disable_ahbprot();
+		//if (!AHBPROT_DISABLED) exit(0);
+	}
 
 	CONF_Init();
 
@@ -342,17 +348,17 @@ int main(int argc, char **argv) {
 	printf("NiioFetch %s", VER);
 
 	printf ("\x1b[7;0H");
-	printf("\n .==         .==.        ==.   .===.   .-==-");
-	printf("\n.====-      -====.      ====+ .=====   -====:");
-	printf("\n .====.    .======     .====.  .===     :==.");
+	printf("\n .==         .==.        ==.   .===.    .===.");
+	printf("\n.====-      -====.      ====+ .=====   .=====");
+	printf("\n .====.    .======     .====.  .===     .===");
 	printf("\n  ====-    =======-   .===== ");
-	printf("\n  .====.  .===-====.  .====.   ====-    ====");
-	printf("\n   ====-  ====. ===-  -===-    ====-    ====");
-	printf("\n   .==== .===- .====..====.    ====-    ====");
-	printf("\n    ====-====.   ===-====:     ====-    ====");
-	printf("\n    .=======-    +=======      ====-    ====");
-	printf("\n     =======     .======:      ====-    ====");
-	printf("\n      =====.      .====-       ====-    ====");
+	printf("\n  .====.  .===-====.  .====.   =====    =====");
+	printf("\n   ====-  ====..===-  -===-    =====    =====");
+	printf("\n   .==== .===-..====..====.    =====    =====");
+	printf("\n    ====-====.  .===-====:     =====    =====");
+	printf("\n    .=======-    +=======      =====    =====");
+	printf("\n     =======     .======:      =====    =====");
+	printf("\n      =====.      .====-       =====    =====");
 
 	printf ("\x1b[6;47H Running on IOS : %d", IOS_GetVersion());
 	printf ("\x1b[7;47H CPU : IBM PowerPC 750CL");
