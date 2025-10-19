@@ -16,7 +16,8 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.0"
+#define VER "1.1"
+
 
 const char *languages[] = {
 	"Japanese",
@@ -37,6 +38,12 @@ const char *regions[] = {
 	"NULL",
 	"Korea",
 	"China"	
+};
+
+enum consoletypes {
+	WII,
+	vWII,
+	dolphin
 };
 
 u16 get_tmd_version(u64 title) { // From the homebrew channel
@@ -258,6 +265,56 @@ void writetoxfb(void* videoBuffer, u32 offset, u32 length, u32 color)
 	}
 }
 
+void printlogo(u8 dev) {
+	switch (dev)
+	{
+		case 0:
+			printf("    &          &          &  &&&&   &&&&\n");
+			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
+			printf("     &&&     &&&&&    &&&&\n");
+			printf("     &&&&   &&& &&&   &&&&   &&&&   &&&&\n");
+			printf("      &&&   &&& &&&  &&&&    &&&&   &&&&\n");
+			printf("      &&&& &&&   &&& &&&&    &&&&   &&&&\n");
+			printf("       &&&&&&&   &&&&&&&     &&&&   &&&&\n");
+			printf("       &&&&&&     &&&&&      &&&&   &&&&\n");
+			printf("        &&&&       &&&&      &&&&   &&&& &&\n");
+		break;
+
+		case 1:
+			printf("&          &         &  &&&  &&& \x1b[96;40m&&+&  &x&  &x&.\x1b[37;40m\n");
+			printf("&&&&      &&&      &&&  &&&  &&& \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
+			printf(" &&&     &&&&&    &&&&           \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
+			printf(" &&&&   &&& &&&   &&&   &&&  &&& \x1b[96;40m&x&&&    .&&$&\x1b[37;40m\n");
+			printf("  &&&   &&& &&&  &&&&   &&&  &&&  \x1b[96;40m&&&&&&&&&&&&\x1b[37;40m\n");
+			printf("  &&&& &&&   &&& &&&&   &&&  &&&\n");
+			printf("   &&&&&&&   &&&&&&&    &&&  &&&\n");
+			printf("   &&&&&&     &&&&&     &&&  &&&\n");
+			printf("    &&&&       &&&&     &&&  &&&\n");
+		break;
+
+		case 2:
+			printf("\x1b[96;40m                  .x.           &&&&&\n");
+			printf("         &&&&&&&&&&&&&&&&&&&&&&&; .X&&&$\n");
+			printf("      &&X     ..::::+;:        .:..\n");
+			printf("    &&: .:;;+$&&&&&&&&&&&&&&&$x++;&&&\n");
+			printf("   &+..;;;+::.               &&&&$  +&&\n");
+			printf("   &;;+;+;+;$&&&&&&&&&&&&        &&&X .&&\n");
+			printf("  &X;+;;xX$&&&&x:::.    :&&&;       &&& .&&\n");
+			printf("&&&&&&&&&&&X   &&xx++&&&&&::&&&       &&&;&&\n");
+			printf(" X&&            &&&;+&    &&&&&&        &&$X&\n");
+			printf("                  &&&&&       &&&&        &&&&\n");
+			printf("                     x&&&        &&         &&&\n");
+			printf("                                             &&&\n");
+			printf("                                              &&\n");
+			printf("                                               &&\n");
+			printf("                                                &\x1b[37;40m\n");
+		break;
+	
+	default:
+		break;
+	}
+} 
+
 //---------------------------------------------------------------------------------
 int main(int argc, char **argv) {
 //---------------------------------------------------------------------------------
@@ -275,6 +332,16 @@ int main(int argc, char **argv) {
 	CONF_Init();
 
 	u16 SMVER = get_tmd_version(0x0000000100000002);
+
+	u8 consoletype = WII;
+
+	s32 test = IOS_Open("/dev/dolphin", 0);
+	
+	if(test) {
+		consoletype = dolphin;
+	}
+
+	IOS_Close(test);
 
 	u8 nickname[11];
 	char drivedate[15] = {0};
@@ -302,6 +369,10 @@ int main(int argc, char **argv) {
 
 	ES_GetNumTitles(&numoftitles);
 	ES_GetBoot2Version(&boot2ver);
+	
+	if(boot2ver == 0) {
+		consoletype = vWII;
+	}
 
 	CONF_GetNickName(nickname);
 	__CONF_GetTxt("CODE", sernumberprefix, 4);
@@ -338,38 +409,44 @@ int main(int argc, char **argv) {
 	VIDEO_WaitVSync();
 	if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
 
-	printf("\x1b[3;%dH",31);
+	printf("\x1b[3;31H");
 
 	printf("NiioFetch %s", VER);
 
 	printf ("\x1b[7;0H");
-	printf("\n .==         .==.        ==.   .===.    .===.");
-	printf("\n.====-      -====.      ====+ .=====   .=====");
-	printf("\n .====.    .======     .====.  .===     .===");
-	printf("\n  ====-    =======-   .===== ");
-	printf("\n  .====.  .===-====.  .====.   =====    =====");
-	printf("\n   ====-  ====..===-  -===-    =====    =====");
-	printf("\n   .==== .===-..====..====.    =====    =====");
-	printf("\n    ====-====.  .===-====:     =====    =====");
-	printf("\n    .=======-    +=======      =====    =====");
-	printf("\n     =======     .======:      =====    =====");
-	printf("\n      =====.      .====-       =====    =====");
+	printlogo(consoletype);
 
-	printf ("\x1b[6;47H Running on IOS : %d", IOS_GetVersion());
-	printf ("\x1b[7;47H CPU : IBM PowerPC 750CL");
-	printf ("\x1b[8;47H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
-	printf ("\x1b[9;47H Boot2 : v%d", boot2ver);
-	printf ("\x1b[10;47H Drive Date : %s", drivedate);
-	printf ("\x1b[11;47H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+	printf ("\x1b[6;48H Running on IOS : %d", IOS_GetVersion());
+	switch (consoletype)
+	{
+		case WII:
+			printf ("\x1b[7;48H CPU : IBM PowerPC 750CL");
+		break;
 
-	printf ("\x1b[12;47H Nickname : %s", nickname);
-	printf ("\x1b[13;47H Wii Model : %s", model);
-	printf ("\x1b[14;47H S/N : %s%s", sernumberprefix, sernumber);
+		case vWII:
+			printf ("\x1b[7;48H CPU : IBM \"Espresso\"");
+		break;
+		
+		case dolphin:
+			printf ("\x1b[7;48H CPU : Emulated CPU");
+		break;
+
+		default:
+		break;
+	}
+	printf ("\x1b[8;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
+	printf ("\x1b[9;48H Boot2 : v%d", boot2ver);
+	printf ("\x1b[10;48H Drive Date : %s", drivedate);
+	printf ("\x1b[11;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+
+	printf ("\x1b[12;48H Nickname : %s", nickname);
+	printf ("\x1b[13;48H Wii Model : %s", model);
+	printf ("\x1b[14;48H S/N : %s%s", sernumberprefix, sernumber);
 	
-	printf ("\x1b[15;47H Region : %s", regions[CONF_GetRegion()]);
-	printf ("\x1b[16;47H Language : %s", languages[CONF_GetLanguage()]);
+	printf ("\x1b[15;48H Region : %s", regions[CONF_GetRegion()]);
+	printf ("\x1b[16;48H Language : %s", languages[CONF_GetLanguage()]);
 
-	printf ("\x1b[17;47H Titles installed  : %d", numoftitles);	
+	printf ("\x1b[17;48H Titles installed  : %d", numoftitles);	
 
 
 	for(int i = 400; i < 416; i++) {
