@@ -16,7 +16,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.1"
+#define VER "1.1.1"
 
 
 const char *languages[] = {
@@ -269,7 +269,7 @@ void printlogo(u8 dev) {
 	switch (dev)
 	{
 		case 0:
-			printf("    &          &          &  &&&&   &&&&\n");
+			printf("    &&&        &        &&&  &&&&   &&&&\n");
 			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
 			printf("     &&&     &&&&&    &&&&\n");
 			printf("     &&&&   &&& &&&   &&&&   &&&&   &&&&\n");
@@ -281,9 +281,9 @@ void printlogo(u8 dev) {
 		break;
 
 		case 1:
-			printf("&          &         &  &&&  &&& \x1b[96;40m&&+&  &x&  &x&.\x1b[37;40m\n");
-			printf("&&&&      &&&      &&&  &&&  &&& \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
-			printf(" &&&     &&&&&    &&&&           \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
+			printf("&&&        &        &&& &&&  &&& \x1b[96;40m&&+&  &x&  &x&.\x1b[37;40m\n");
+			printf("&&&&      &&&      &&&& &&&  &&& \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
+			printf(" &&&     &&&&&     &&&           \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
 			printf(" &&&&   &&& &&&   &&&   &&&  &&& \x1b[96;40m&x&&&    .&&$&\x1b[37;40m\n");
 			printf("  &&&   &&& &&&  &&&&   &&&  &&&  \x1b[96;40m&&&&&&&&&&&&\x1b[37;40m\n");
 			printf("  &&&& &&&   &&& &&&&   &&&  &&&\n");
@@ -337,7 +337,7 @@ int main(int argc, char **argv) {
 
 	s32 test = IOS_Open("/dev/dolphin", 0);
 	
-	if(test) {
+	if(!test) {
 		consoletype = dolphin;
 	}
 
