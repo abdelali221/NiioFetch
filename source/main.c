@@ -337,7 +337,7 @@ int main(int argc, char **argv) {
 
 	s32 test = IOS_Open("/dev/dolphin", 0);
 	
-	if(!test) {
+	if(test >= 0) {
 		consoletype = dolphin;
 	}
 
