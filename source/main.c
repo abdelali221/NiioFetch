@@ -434,19 +434,27 @@ int main(int argc, char **argv) {
 		default:
 		break;
 	}
-	printf ("\x1b[8;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
-	printf ("\x1b[9;48H Boot2 : v%d", boot2ver);
-	printf ("\x1b[10;48H Drive Date : %s", drivedate);
-	printf ("\x1b[11;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+	s32 __net_hid = iosCreateHeap(1024);
+	u8 *buff = iosAlloc(__net_hid, 8);
 
-	printf ("\x1b[12;48H Nickname : %s", nickname);
-	printf ("\x1b[13;48H Wii Model : %s", model);
-	printf ("\x1b[14;48H S/N : %s%s", sernumberprefix, sernumber);
+	s32 fd = IOS_Open("/dev/net/wd/command", 65539);
+	IOS_IoctlvFormat(__net_hid, fd, 0x100e, ":d", buff, 8);
+	printf ("\x1b[9;48H Internal MAC : %X-%X-%X-%X-%X-%X-%X-%X", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5], buff[6], buff[7]);
+	IOS_Close(fd);
+	iosFree(__net_hid, buff);
+	printf ("\x1b[9;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
+	printf ("\x1b[10;48H Boot2 : v%d", boot2ver);
+	printf ("\x1b[11;48H Drive Date : %s", drivedate);
+	printf ("\x1b[12;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+
+	printf ("\x1b[13;48H Nickname : %s", nickname);
+	printf ("\x1b[14;48H Wii Model : %s", model);
+	printf ("\x1b[15;48H S/N : %s%s", sernumberprefix, sernumber);
 	
-	printf ("\x1b[15;48H Region : %s", regions[CONF_GetRegion()]);
-	printf ("\x1b[16;48H Language : %s", languages[CONF_GetLanguage()]);
+	printf ("\x1b[16;48H Region : %s", regions[CONF_GetRegion()]);
+	printf ("\x1b[17;48H Language : %s", languages[CONF_GetLanguage()]);
 
-	printf ("\x1b[17;48H Titles installed  : %d", numoftitles);	
+	printf ("\x1b[18;48H Titles installed  : %d", numoftitles);	
 
 
 	for(int i = 400; i < 416; i++) {
@@ -471,21 +479,13 @@ int main(int argc, char **argv) {
 	}
 
 	while(1) {
-
-		// Call WPAD_ScanPads each loop, this reads the latest controller states
-
 		WPAD_ScanPads();
-
-		// WPAD_ButtonsDown tells us which buttons were pressed in this loop
-		// this is a "one shot" state which will not fire again until the button has been released
 		u32 pressed = WPAD_ButtonsDown(0);
 
-		// We return to the launcher application via exit
 		if ( pressed & WPAD_BUTTON_HOME ) {
 			exit(0);
 		}
 
-		// Wait for the next frame
 		VIDEO_WaitVSync();
 	}
 
