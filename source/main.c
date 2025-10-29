@@ -16,7 +16,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.1.1"
+#define VER "1.2"
 
 
 const char *languages[] = {
@@ -437,9 +437,9 @@ int main(int argc, char **argv) {
 	s32 __net_hid = iosCreateHeap(1024);
 	u8 *buff = iosAlloc(__net_hid, 8);
 
-	s32 fd = IOS_Open("/dev/net/wd/command", 65539);
+	s32 fd = IOS_Open("/dev/net/wd/command", 3);
 	IOS_IoctlvFormat(__net_hid, fd, 0x100e, ":d", buff, 8);
-	printf ("\x1b[9;48H Internal MAC : %X-%X-%X-%X-%X-%X-%X-%X", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5], buff[6], buff[7]);
+	printf ("\x1b[8;48H WiFi MAC : %2X-%2X-%2X-%2X-%2X-%2X", buff[0], buff[1], buff[2], buff[3], buff[4], buff[5]);
 	IOS_Close(fd);
 	iosFree(__net_hid, buff);
 	printf ("\x1b[9;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
