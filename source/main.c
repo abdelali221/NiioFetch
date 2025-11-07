@@ -453,20 +453,21 @@ int main(int argc, char **argv) {
 	}
 	IOS_Close(fd);
 	iosFree(__net_hid, buff);
-	
+
 	printf ("\x1b[9;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
 	printf ("\x1b[10;48H Boot2 : v%d", boot2ver);
 	printf ("\x1b[11;48H Drive Date : %s", drivedate);
-	printf ("\x1b[12;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+	printf ("\x1b[12;48H Hollywood Revision : 0x%2X", SYS_GetHollywoodRevision());
+	printf ("\x1b[13;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
 
-	printf ("\x1b[13;48H Nickname : %s", nickname);
-	printf ("\x1b[14;48H Wii Model : %s", model);
-	printf ("\x1b[15;48H S/N : %s%s", sernumberprefix, sernumber);
+	printf ("\x1b[14;48H Nickname : %s", nickname);
+	printf ("\x1b[15;48H Wii Model : %s", model);
+	printf ("\x1b[16;48H S/N : %s%s", sernumberprefix, sernumber);
 	
-	printf ("\x1b[16;48H Region : %s", regions[CONF_GetRegion()]);
-	printf ("\x1b[17;48H Language : %s", languages[CONF_GetLanguage()]);
+	printf ("\x1b[17;48H Region : %s", regions[CONF_GetRegion()]);
+	printf ("\x1b[18;48H Language : %s", languages[CONF_GetLanguage()]);
 
-	printf ("\x1b[18;48H Titles installed  : %d", numoftitles);	
+	printf ("\x1b[19;48H Titles installed  : %d", numoftitles);	
 
 
 	for(int i = 400; i < 416; i++) {
