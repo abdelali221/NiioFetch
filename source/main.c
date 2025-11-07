@@ -457,7 +457,7 @@ int main(int argc, char **argv) {
 	printf ("\x1b[9;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
 	printf ("\x1b[10;48H Boot2 : v%d", boot2ver);
 	printf ("\x1b[11;48H Drive Date : %s", drivedate);
-	printf ("\x1b[12;48H Hollywood Revision : 0x%2X", SYS_GetHollywoodRevision());
+	printf ("\x1b[12;48H Hollywood Revision : 0x%X", SYS_GetHollywoodRevision());
 	printf ("\x1b[13;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
 
 	printf ("\x1b[14;48H Nickname : %s", nickname);
