@@ -344,7 +344,7 @@ int main(int argc, char **argv) {
 	IOS_Close(test);
 
 	u8 nickname[11];
-	char drivedate[15] = {0};
+	char drivedate[15];
 	char sernumber[11];
 	char sernumberprefix[4];
 	char model[14];
@@ -353,16 +353,10 @@ int main(int argc, char **argv) {
 	if (ahbprot) { // A wise man once told me that AHBPROT should be absent for homebrew to prosper
 		DI_Init();
 		if(!DI_Identify(&DI_id)) {
-			sprintf(drivedate, "%8X", DI_id.rel_date); // Prints it as "YYYYMMDD"
-			for(int i = 0; i < 4; i++) {
-				drivedate[8-i] = drivedate[7-i]; // Makes it "YYYY MMDD" to add the first '/'
-			}
-			for(int i = 0; i < 2; i++) {
-				drivedate[9-i] = drivedate[8-i]; // Makes it "YYYY MM DD" to add the second '/'
-			}
-			drivedate[4] = '/'; // Puts the first slash
-			drivedate[7] = '/'; // Puts the second slash
-			drivedate[10] = 0; // Remember kids, Null termination is very important when messing with strings
+			uint32_t y = (DI_id.rel_date >> 16) & 0xffff;
+			uint32_t m = (DI_id.rel_date >>  8) & 0x00ff;
+			uint32_t d = (DI_id.rel_date >>  0) & 0x00ff;
+			snprintf(drivedate, sizeof drivedate, "%04X/%02X/%02X", y, m, d);
 		}
 		DI_Close();
 	}
