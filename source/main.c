@@ -442,11 +442,7 @@ int main(int argc, char **argv) {
 	printf ("\x1b[8;48H WiFi MAC : ");
 	for (int i = 0; i < 6; i++)
 	{
-		if(buff[i] == 0) {
-			printf("00");
-		} else {
-			printf("%2X", buff[i]);
-		}
+		printf("%02X", buff[i]);
 		if (i < 5) {
 			putchar('-');
 		}
