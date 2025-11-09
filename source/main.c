@@ -16,7 +16,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.2"
+#define VER "1.3"
 
 
 const char *languages[] = {
@@ -43,6 +43,7 @@ const char *regions[] = {
 enum consoletypes {
 	WII,
 	vWII,
+	mWII,
 	dolphin
 };
 
@@ -268,7 +269,8 @@ void writetoxfb(void* videoBuffer, u32 offset, u32 length, u32 color)
 void printlogo(u8 dev) {
 	switch (dev)
 	{
-		case 0:
+		case WII:
+		case mWII:
 			printf("    &&&        &        &&&  &&&&   &&&&\n");
 			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
 			printf("     &&&     &&&&&    &&&&\n");
@@ -280,7 +282,7 @@ void printlogo(u8 dev) {
 			printf("        &&&&       &&&&      &&&&   &&&& &&\n");
 		break;
 
-		case 1:
+		case vWII:
 			printf("&&&        &        &&& &&&  &&& \x1b[96;40m&&+&  &x&  &x&.\x1b[37;40m\n");
 			printf("&&&&      &&&      &&&& &&&  &&& \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
 			printf(" &&&     &&&&&     &&&           \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
@@ -292,7 +294,7 @@ void printlogo(u8 dev) {
 			printf("    &&&&       &&&&     &&&  &&&\n");
 		break;
 
-		case 2:
+		case dolphin:
 			printf("\x1b[96;40m                  .x.           &&&&&\n");
 			printf("         &&&&&&&&&&&&&&&&&&&&&&&; .X&&&$\n");
 			printf("      &&X     ..::::+;:        .:..\n");
@@ -458,7 +460,7 @@ int main(int argc, char **argv) {
 	printf ("\x1b[10;48H Boot2 : v%d", boot2ver);
 	printf ("\x1b[11;48H Drive Date : %s", drivedate);
 	printf ("\x1b[12;48H Hollywood Revision : 0x%X", SYS_GetHollywoodRevision());
-	printf ("\x1b[13;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+	printf ("\x1b[13;48H Resolution : %d%c", rmode->viHeight, VIDEO_GetVideoScanMode() ? 'i' : 'p');
 
 	printf ("\x1b[14;48H Nickname : %s", nickname);
 	printf ("\x1b[15;48H Wii Model : %s", model);
