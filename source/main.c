@@ -16,7 +16,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.2"
+#define VER "1.3"
 
 
 const char *languages[] = {
@@ -43,6 +43,7 @@ const char *regions[] = {
 enum consoletypes {
 	WII,
 	vWII,
+	mWII,
 	dolphin
 };
 
@@ -268,7 +269,8 @@ void writetoxfb(void* videoBuffer, u32 offset, u32 length, u32 color)
 void printlogo(u8 dev) {
 	switch (dev)
 	{
-		case 0:
+		case WII:
+		case mWII:
 			printf("    &&&        &        &&&  &&&&   &&&&\n");
 			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
 			printf("     &&&     &&&&&    &&&&\n");
@@ -280,7 +282,7 @@ void printlogo(u8 dev) {
 			printf("        &&&&       &&&&      &&&&   &&&& &&\n");
 		break;
 
-		case 1:
+		case vWII:
 			printf("&&&        &        &&& &&&  &&& \x1b[96;40m&&+&  &x&  &x&.\x1b[37;40m\n");
 			printf("&&&&      &&&      &&&& &&&  &&& \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
 			printf(" &&&     &&&&&     &&&           \x1b[96;40m&&x&  &&& .&x&.\x1b[37;40m\n");
@@ -292,7 +294,7 @@ void printlogo(u8 dev) {
 			printf("    &&&&       &&&&     &&&  &&&\n");
 		break;
 
-		case 2:
+		case dolphin:
 			printf("\x1b[96;40m                  .x.           &&&&&\n");
 			printf("         &&&&&&&&&&&&&&&&&&&&&&&; .X&&&$\n");
 			printf("      &&X     ..::::+;:        .:..\n");
@@ -410,19 +412,19 @@ int main(int argc, char **argv) {
 	printf ("\x1b[7;0H");
 	printlogo(consoletype);
 
-	printf ("\x1b[6;48H Running on IOS : %d", IOS_GetVersion());
+	printf ("\x1b[5;48H Running on IOS : %d", IOS_GetVersion());
 	switch (consoletype)
 	{
 		case WII:
-			printf ("\x1b[7;48H CPU : IBM PowerPC 750CL");
+			printf ("\x1b[6;48H CPU : IBM PowerPC 750CL");
 		break;
 
 		case vWII:
-			printf ("\x1b[7;48H CPU : IBM \"Espresso\"");
+			printf ("\x1b[6;48H CPU : IBM \"Espresso\"");
 		break;
 		
 		case dolphin:
-			printf ("\x1b[7;48H CPU : Emulated CPU");
+			printf ("\x1b[6;48H CPU : Emulated CPU");
 		break;
 
 		default:
@@ -433,7 +435,7 @@ int main(int argc, char **argv) {
 
 	s32 fd = IOS_Open("/dev/net/wd/command", 3);
 	IOS_IoctlvFormat(__net_hid, fd, 0x100e, ":d", buff, 6);
-	printf ("\x1b[8;48H WiFi MAC : ");
+	printf ("\x1b[7;48H WiFi MAC : ");
 	for (int i = 0; i < 6; i++)
 	{
 		printf("%02X", buff[i]);
@@ -444,20 +446,22 @@ int main(int argc, char **argv) {
 	IOS_Close(fd);
 	iosFree(__net_hid, buff);
 
-	printf ("\x1b[9;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
-	printf ("\x1b[10;48H Boot2 : v%d", boot2ver);
-	printf ("\x1b[11;48H Drive Date : %s", drivedate);
-	printf ("\x1b[12;48H Hollywood Revision : 0x%X", SYS_GetHollywoodRevision());
-	printf ("\x1b[13;48H Resolution : %dx%d", rmode->viWidth, rmode->viHeight);
+	printf ("\x1b[8;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
+	printf ("\x1b[9;48H Boot2 : v%d", boot2ver);
+	printf ("\x1b[10;48H Drive Date : %s", drivedate);
+	printf ("\x1b[11;48H Hollywood Revision : 0x%X", SYS_GetHollywoodRevision());
+	printf ("\x1b[12;48H Resolution : %d%c", rmode->viHeight, VIDEO_GetVideoScanMode() ? 'p' : 'i');
 
-	printf ("\x1b[14;48H Nickname : %s", nickname);
-	printf ("\x1b[15;48H Wii Model : %s", model);
-	printf ("\x1b[16;48H S/N : %s%s", sernumberprefix, sernumber);
+	printf ("\x1b[13;48H Nickname : %s", nickname);
+	printf ("\x1b[14;48H Wii Model : %s", model);
+	printf ("\x1b[15;48H S/N : %s%s", sernumberprefix, sernumber);
 	
-	printf ("\x1b[17;48H Region : %s", regions[CONF_GetRegion()]);
-	printf ("\x1b[18;48H Language : %s", languages[CONF_GetLanguage()]);
+	printf ("\x1b[16;48H Region : %s", regions[CONF_GetRegion()]);
+	printf ("\x1b[17;48H Language : %s", languages[CONF_GetLanguage()]);
 
-	printf ("\x1b[19;48H Titles installed  : %d", numoftitles);	
+	printf ("\x1b[18;48H Titles installed  : %d", numoftitles);	
+
+	printf ("\x1b[19;48H P1 Battery Level : %d", WPAD_BatteryLevel(0));
 
 
 	for(int i = 400; i < 416; i++) {
@@ -482,6 +486,7 @@ int main(int argc, char **argv) {
 	}
 
 	while(1) {
+		printf ("\x1b[19;48H P1 Battery Level : %d    ", WPAD_BatteryLevel(0));
 		WPAD_ScanPads();
 		u32 pressed = WPAD_ButtonsDown(0);
 
