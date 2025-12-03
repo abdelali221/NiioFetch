@@ -362,7 +362,6 @@ void GetConsoleType() {
 	if (strcmp(model, "RVL-201") == 0) {
 		consoletype = mWII;
 	}
-	consoletype = mWII;
 }
 void GetDriveDate() {
 	bool ahbprot = disable_ahbprot();
