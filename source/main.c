@@ -466,8 +466,9 @@ int main(int argc, char **argv) {
 	printf ("\x1b[17;48H Language : %s", languages[CONF_GetLanguage()]);
 
 	printf ("\x1b[18;48H Titles installed  : %d", numoftitles);	
-
-	printf ("\x1b[19;48H P1 Battery Level : %d%%", WPAD_BatteryLevel(0));
+	u8 batterylevel = WPAD_BatteryLevel(0);
+	if (batterylevel > 100 ) batterylevel = 100;
+	printf ("\x1b[19;48H P1 Battery Level : %d%%", batterylevel);
 
 
 	for(int i = 400; i < 416; i++) {
@@ -492,7 +493,9 @@ int main(int argc, char **argv) {
 	}
 
 	while(1) {
-		printf ("\x1b[19;48H P1 Battery Level : %d%%    ", WPAD_BatteryLevel(0));
+		batterylevel = WPAD_BatteryLevel(0);
+		if (batterylevel > 100 ) batterylevel = 100;
+		printf ("\x1b[19;48H P1 Battery Level : %d%%", batterylevel);
 		WPAD_ScanPads();
 		u32 pressed = WPAD_ButtonsDown(0);
 
