@@ -10,13 +10,22 @@
 #define AHBPROT_DISABLED (*(vu32*)0xcd800064 == 0xFFFFFFFF)
 
 DI_DriveID DI_id;
+u8 nickname[11];
+char drivedate[15] = {0};
+char sernumber[11];
+char sernumberprefix[4];
+char model[14];
+u32 boot2ver = 0;
+u32 numoftitles = 0;
+u8 consoletype = 0;
+u16 SMVER;
 
 static void *xfb = NULL;
 static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.3"
+#define VER "1.3.1"
 
 
 const char *languages[] = {
@@ -270,6 +279,17 @@ void printlogo(u8 dev) {
 	switch (dev)
 	{
 		case WII:
+			printf("    &&&        &        &&&  &&&&   &&&&\n");
+			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
+			printf("     &&&     &&&&&    &&&&\n");
+			printf("     &&&&   &&& &&&   &&&&   &&&&   &&&&\n");
+			printf("      &&&   &&& &&&  &&&&    &&&&   &&&&\n");
+			printf("      &&&& &&&   &&& &&&&    &&&&   &&&&\n");
+			printf("       &&&&&&&   &&&&&&&     &&&&   &&&&\n");
+			printf("       &&&&&&     &&&&&      &&&&   &&&&\n");
+			printf("        &&&&       &&&&      &&&&   &&&& &&\n");
+		break;
+
 		case mWII:
 			printf("    &&&        &        &&&  &&&&   &&&&\n");
 			printf("    &&&&      &&&      &&&&  &&&&   &&&&\n");
@@ -280,6 +300,15 @@ void printlogo(u8 dev) {
 			printf("       &&&&&&&   &&&&&&&     &&&&   &&&&\n");
 			printf("       &&&&&&     &&&&&      &&&&   &&&&\n");
 			printf("        &&&&       &&&&      &&&&   &&&& &&\n");
+			printf(" -------------------------------------------\n");
+			printf(" -------------------------------------------\n");
+			printf("                      @@           :@@ \n");
+			printf("                       .             .\n");
+			printf("        +@@@@@@@@@@   @@   @@@@@@  :@@\n");
+			printf("       :@@  =@@  *@@  @@  @@-  *@* :@@\n");
+			printf("       :@@  =@@  *@@  @@  @@:  +@* :@@\n");
+			printf("       :@@  =@@  *@@  @@  @@.  +@* :@@ \n");
+ 
 		break;
 
 		case vWII:
@@ -317,26 +346,7 @@ void printlogo(u8 dev) {
 	}
 } 
 
-//---------------------------------------------------------------------------------
-int main(int argc, char **argv) {
-//---------------------------------------------------------------------------------
-
-	// Initialise the video system
-	VIDEO_Init();
-
-	// This function initialises the attached controllers
-	WPAD_Init();
-
-	bool ahbprot = disable_ahbprot();
-
-	if (!AHBPROT_DISABLED) exit(0);
-
-	CONF_Init();
-
-	u16 SMVER = get_tmd_version(0x0000000100000002);
-
-	u8 consoletype = WII;
-
+void GetConsoleType() {
 	s32 test = IOS_Open("/dev/dolphin", 0);
 	
 	if(test >= 0) {
@@ -345,13 +355,19 @@ int main(int argc, char **argv) {
 
 	IOS_Close(test);
 
-	u8 nickname[11];
-	char drivedate[15] = {0};
-	char sernumber[11];
-	char sernumberprefix[4];
-	char model[14];
-	u32 boot2ver = 0;
-	u32 numoftitles = 0;
+	if(boot2ver == 0) {
+		consoletype = vWII;
+	}
+
+	if (strcmp(model, "RVL-201") == 0) {
+		consoletype = mWII;
+	}
+	consoletype = mWII;
+}
+void GetDriveDate() {
+	bool ahbprot = disable_ahbprot();
+
+	if (!AHBPROT_DISABLED) exit(0);
 	if (ahbprot) { // A wise man once told me that AHBPROT should be absent for homebrew to prosper
 		DI_Init();
 		if(!DI_Identify(&DI_id)) {
@@ -368,18 +384,31 @@ int main(int argc, char **argv) {
 		}
 		DI_Close();
 	}
+}
+//---------------------------------------------------------------------------------
+int main(int argc, char **argv) {
+//---------------------------------------------------------------------------------
+
+	// Initialise the video system
+	VIDEO_Init();
+
+	// This function initialises the attached controllers
+	WPAD_Init();
+
+	CONF_Init();
+
+	SMVER = get_tmd_version(0x0000000100000002);
 
 	ES_GetNumTitles(&numoftitles);
 	ES_GetBoot2Version(&boot2ver);
 	
-	if(boot2ver == 0) {
-		consoletype = vWII;
-	}
-
 	CONF_GetNickName(nickname);
 	__CONF_GetTxt("CODE", sernumberprefix, 4);
 	__CONF_GetTxt("SERNO", sernumber, 10);
 	__CONF_GetTxt("MODEL", model, 13);
+
+	GetConsoleType();
+	GetDriveDate();
 
 	// Obtain the preferred video mode from the system
 	// This will correspond to the settings in the Wii menu
@@ -422,6 +451,7 @@ int main(int argc, char **argv) {
 	switch (consoletype)
 	{
 		case WII:
+		case mWII:
 			printf ("\x1b[6;48H CPU : IBM PowerPC 750CL");
 		break;
 
