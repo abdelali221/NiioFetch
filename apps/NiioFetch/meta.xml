@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <app version="1">
 	<name>NiioFetch</name>
-	<version>1.3</version>
-	<release_date>20251111000000</release_date>
+	<version>1.3.1</version>
+	<release_date>20251206000000</release_date>
 	<coder>Abdelali221</coder>
 	<short_description>Check your Wii's Info!</short_description>
 	<long_description>This app lets you check some infos about your Wii, such as the nickname, the System Menu and boot2 version, the console's model and much more!
