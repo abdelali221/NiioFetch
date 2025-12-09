@@ -351,15 +351,10 @@ void GetConsoleType() {
 	
 	if(test >= 0) {
 		consoletype = dolphin;
-	}
-
-	IOS_Close(test);
-
-	if(boot2ver == 0) {
+		IOS_Close(test);
+	} else if(boot2ver == 0) {
 		consoletype = vWII;
-	}
-
-	if (strcmp(model, "RVL-201") == 0) {
+	} else if (strcmp(model, "RVL-201") == 0) {
 		consoletype = mWII;
 	}
 }
