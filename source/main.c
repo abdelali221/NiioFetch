@@ -354,7 +354,7 @@ void GetConsoleType() {
 		IOS_Close(test);
 	} else if(boot2ver == 0) {
 		consoletype = vWII;
-	} else if (strcmp(model, "RVL-201") == 0) {
+	} else if (strncmp(model, "RVL-201", 7) == 0) {
 		consoletype = mWII;
 	}
 }
