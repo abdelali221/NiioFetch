@@ -21,14 +21,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <ogc/machine/processor.h>
 #include <gccore.h>
+#include <ogc/machine/processor.h>
 #include <wiiuse/wpad.h>
 #include <string.h>
 #include <di/di.h>
 #include "ios.h"
 
 #define AHBPROT_DISABLED (*(vu32*)0xcd800064 == 0xFFFFFFFF)
+#define IS_VWII ((*(vu32*)(0xCD8005A0) >> 16 ) == 0xCAFE)
 
 DI_DriveID DI_id;
 u8 nickname[11];
@@ -46,7 +47,7 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.3.1"
+#define VER "1.3.3"
 
 
 const char *languages[] = {
@@ -373,7 +374,7 @@ void GetConsoleType() {
 	if(test >= 0) {
 		consoletype = dolphin;
 		IOS_Close(test);
-	} else if(boot2ver == 0) {
+	} else if(IS_VWII) {
 		consoletype = vWII;
 	} else if (strncmp(model, "RVL-201", 7) == 0) {
 		consoletype = mWII;
