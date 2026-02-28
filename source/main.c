@@ -26,6 +26,7 @@
 #include <wiiuse/wpad.h>
 #include <string.h>
 #include <di/di.h>
+#include <ogc/wd.h>
 #include "ios.h"
 
 #define AHBPROT_DISABLED (*(vu32*)0xcd800064 == 0xFFFFFFFF)
@@ -47,14 +48,14 @@ static GXRModeObj *rmode = NULL;
 
 extern int __CONF_GetTxt(const char *name, char *buf, int length);
 
-#define VER "1.3.3"
-
+#define VER "1.3.4"
 
 const char *languages[] = {
 	"Japanese",
 	"English",
 	"German",
 	"French",
+	"Spanish",
 	"Italian",
 	"Dutch",
 	"Chinese (Simplified)",
@@ -482,21 +483,18 @@ int main(int argc, char **argv) {
 		default:
 		break;
 	}
-	s32 __net_hid = iosCreateHeap(1024);
-	u8 *buff = iosAlloc(__net_hid, 6);
+	WDInfo inf;
 
-	s32 fd = IOS_Open("/dev/net/wd/command", 3);
-	IOS_IoctlvFormat(__net_hid, fd, 0x100e, ":d", buff, 6);
+	WD_GetInfo(&inf);
+
 	printf ("\x1b[7;48H WiFi MAC : ");
 	for (int i = 0; i < 6; i++)
 	{
-		printf("%02X", buff[i]);
+		printf("%02X", inf.MAC[i]);
 		if (i < 5) {
 			putchar('-');
 		}
 	}
-	IOS_Close(fd);
-	iosFree(__net_hid, buff);
 
 	printf ("\x1b[8;48H System Menu : %.1f%c", GetSysMenuNintendoVersion(SMVER), GetSysMenuRegion(SMVER));
 	printf ("\x1b[9;48H Boot2 : v%d", boot2ver);
